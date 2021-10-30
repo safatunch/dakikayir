@@ -1,6 +1,6 @@
 <template>
 <div class="row">
-      <app-slider :Height="400"></app-slider>
+      <app-slider :Images="images" :Height="400"></app-slider>
       <div style="position: absolute; top:0; height:400px; left:0; right: 0; background-color: rgba(0, 0, 0, 0.25)">
         <div class="d-flex flex-column flex-1 justify-content-end h-100">
         <h1 class="text-center pb-5 mb-2 text-white" style="text-shadow: 1px 1px 5px black">{{Venue.Name}}</h1>
@@ -9,11 +9,12 @@
       <div class="col-lg-2">
         <h4 class="mt-4">Related Venues</h4>
         <hr style="width: 25px" />
-        <venue-single v-for="_Venue in Venues" :key="_Venue.Id" :Venue="_Venue"></venue-single>
+        <venue-single v-for="_Venue in Venues.slice(0, 4)" :key="_Venue.Id" :Venue="_Venue"></venue-single>
       </div>
       <div class="col-lg-7">
         <div class="m-4">
-        <h5>Fiyat: {{Venue.VenueFeeGroup.VenueFees[0].Price | Price}}/Günlük</h5>
+        <h5 v-if="Venue.VenueFeeGroup && Venue.VenueFeeGroup.VenueFees">Fiyat: {{Venue.VenueFeeGroup.VenueFees[0].Price | Price}}/Günlük</h5>
+        <h5 v-else>No price info</h5>
         <p>
         <star :Star="2.5"></star>
         <span>(Google Görüşleri)</span>
@@ -77,14 +78,24 @@ export default {
     CommentList,
     GoogleMap
   },
-  computed: mapGetters(['Venue']),
   beforeCreate () {
     this.$store.dispatch('GetVenue', this.$route.params.Id)
-    console.log(this.$store.getters.Venues)
+    setTimeout(() => {
+      this.$store.dispatch('GetVenues')
+    }, 1000)
   },
   filters: {
     Price: function (value) {
       return value.toFixed(2) + ' TL'
+    }
+  },
+  computed: {
+    ...mapGetters(['Venue', 'Venues']),
+    images: function () {
+      if (this.Venue && this.Venue.UploadSet && this.Venue.UploadSet.Uploads && this.Venue.UploadSet.Uploads.length > 0) {
+        return this.Venue.UploadSet.Uploads.map(x => x.Url)
+      }
+      return []
     }
   }
 }
