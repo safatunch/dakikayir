@@ -33,6 +33,12 @@ const Login = resolve => {
   })
 }
 
+const Register = resolve => {
+  require.ensure(['../screens/Account/Register'], () => {
+    resolve(require('../screens/Account/Register'))
+  })
+}
+
 export const router = new VueRouter({
   routes: [{
     component: Index,
@@ -44,10 +50,15 @@ export const router = new VueRouter({
     path: '/Venue/:Id',
     name: 'VenueDetail',
     component: VenueDetail,
-    meta: { layout: Layout }
+    meta: { layout: Layout, requiresAuth: true }
   },
   {
-    path: '/Account',
+    path: '/Account/Register',
+    component: Register,
+    meta: { layout: EmptyLayout }
+  },
+  {
+    path: '/Account/Login',
     component: Login,
     meta: { layout: EmptyLayout }
   }

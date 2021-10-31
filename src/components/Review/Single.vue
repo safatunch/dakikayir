@@ -9,20 +9,20 @@
             object-fit: cover;
             border: 1px solid gray;
           "
-          :src="Comment.Photo"
+          :src="Review.OwnerPhoto"
           class="img rounded-circle"
           alt=""
         />
-        <star class="mt-2 d-block" :Star="Comment.Star"></star>
-        <a style="text-decoration: none" class="d-inline-block" href="javascript:void(0)">{{
-          Comment.Owner
+        <star class="mt-2 d-block" :Star="Review.Rating"></star>
+        <a style="text-decoration: none" class="d-inline-block" target="_blank" :href="Review.OwnerUrl">{{
+          Review.Owner
         }}</a>
       </div>
-      <div>
+      <div class="w-100">
         <p style="display: inline-block; text-indent: 20px" class="mx-3">
-          {{ Comment.Comment }}
+          {{ Review.Text }}
         </p>
-        <p class="text-muted" style="text-align: right">2 gün önce</p>
+        <p class="text-muted" style="text-align: right">{{ Review.Time }}</p>
       </div>
     </div>
   </div>
@@ -32,9 +32,11 @@
 import Star from '../Venue/Star.vue'
 export default {
   components: { Star },
-  name: 'Comment',
+  name: 'Review',
   props: {
-    Comment
+    Review: {
+      required: true
+    }
   }
 }
 </script>

@@ -29,13 +29,21 @@ const mutations = {
 }
 
 const actions = {
-  GetVenues ({commit}) {
-    Vue.http.get('http://localhost:8081/Venue').then(response => {
+  GetVenues ({commit}, query) {
+    var url = 'Venue'
+    var params = ''
+    if (query && query.page) {
+      params += ('page=' + query.page + '&')
+    }
+    if (query && query.limit) {
+      params += ('limit=' + query.limit + '&')
+    }
+    Vue.http.get(url + '?' + params).then(response => {
       commit('SetVenues', response.body)
     })
   },
   GetVenue ({commit}, id) {
-    Vue.http.get('http://localhost:8081/Venue/' + id).then(response => {
+    Vue.http.get('Venue/' + id).then(response => {
       commit('SetVenue', response.body)
     })
   }

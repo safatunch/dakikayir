@@ -9,30 +9,33 @@
       <div class="col-lg-2">
         <h4 class="mt-4">Related Venues</h4>
         <hr style="width: 25px" />
-        <venue-single v-for="_Venue in Venues.slice(0, 4)" :key="_Venue.Id" :Venue="_Venue"></venue-single>
+        <venue-single v-for="_Venue in Venues" :key="_Venue.Id" :Venue="_Venue"></venue-single>
       </div>
       <div class="col-lg-7">
         <div class="m-4">
         <h5 v-if="Venue.VenueFeeGroup && Venue.VenueFeeGroup.VenueFees">Fiyat: {{Venue.VenueFeeGroup.VenueFees[0].Price | Price}}/Günlük</h5>
-        <h5 v-else>No price info</h5>
-        <p>
-        <star :Star="2.5"></star>
+        <h5 v-else>Fiyat bilgisi yok</h5>
+        <p v-if="rating">
+        <star :Star="rating"></star>
         <span>(Google Görüşleri)</span>
         </p>
-        <address class="mb-1">Adres: Yazır Mahallesi Haseki Sokak Yazır Konakları 11/5</address>
+        <address v-if="Venue.Place" class="mb-1">Adres: {{ Venue.Place.formatted_address }}</address>
         <google-map></google-map>
-        <div class="col-lg-12 d-flex flex-column mt-4">
-          <h4>Eklentiler</h4>
-          <a href="#">Dosya.pdf</a>
-          <a href="#">Dosya-2-Tanıtım.pdf</a>
+        <div class="col-lg-12 d-flex flex-column mt-4" v-if="docs && docs.length > 0">
+          <h4>Dosyalar</h4>
+          <a v-for="(doc, index) in docs" target="_blank" :key="index" :href="doc.Url">{{doc.Name}}</a>
         </div>
-        <comment-list></comment-list>
+        <review-list :Reviews="reviews"></review-list>
         </div>
       </div>
       <div class="col-lg-3">
+        <company-single class="mt-4"></company-single>
         <div class="card mt-4">
           <div class="card-body">
-            <h4 class="card-title">Rezervasyon Yap!</h4>
+                  <h4 class="card-title">
+                  <span class="bi bi-calendar-date" style="margin:0 auto"></span> Rezervasyon Yap
+                  </h4>
+                  <hr />
             <div class="mb-3">
               <label for="" class="form-label">Tarih</label>
               <input type="date" name="" id="" class="form-control" placeholder="" aria-describedby="helpId">
@@ -62,10 +65,11 @@
 </template>
 
 <script>
-import CommentList from '../../components/Comment/List.vue'
+import ReviewList from '../../components/Review/List.vue'
 import GoogleMap from '../../components/Maps/GoogleMap.vue'
 import AppSlider from '../../components/Shared/Slider.vue'
 import VenueSingle from '../../components/Venue/Single.vue'
+import CompanySingle from '../../components/Company/Single.vue'
 import Star from '../../components/Venue/Star.vue'
 import { mapGetters } from 'vuex'
 
@@ -75,13 +79,14 @@ export default {
     AppSlider,
     VenueSingle,
     Star,
-    CommentList,
-    GoogleMap
+    ReviewList,
+    GoogleMap,
+    CompanySingle
   },
   beforeCreate () {
     this.$store.dispatch('GetVenue', this.$route.params.Id)
     setTimeout(() => {
-      this.$store.dispatch('GetVenues')
+      this.$store.dispatch('GetVenues', {page: 1, limit: 4})
     }, 1000)
   },
   filters: {
@@ -93,9 +98,45 @@ export default {
     ...mapGetters(['Venue', 'Venues']),
     images: function () {
       if (this.Venue && this.Venue.UploadSet && this.Venue.UploadSet.Uploads && this.Venue.UploadSet.Uploads.length > 0) {
-        return this.Venue.UploadSet.Uploads.map(x => x.Url)
+        return this.Venue.UploadSet.Uploads.filter(x => x.DocType === 'image').map(x => x.Url)
       }
-      return []
+      return null
+    },
+    docs: function () {
+      if (this.Venue && this.Venue.UploadSet && this.Venue.UploadSet.Uploads && this.Venue.UploadSet.Uploads.length > 0) {
+        return this.Venue.UploadSet.Uploads.filter(x => x.DocType !== 'image')
+      }
+      return null
+    },
+    reviews: function () {
+      if (this.Venue.Place && this.Venue.Place.reviews) {
+        return this.Venue.Place.reviews.map((review) => {
+          return {
+            Text: review.text,
+            Owner: review.author_name,
+            OwnerPhoto: review.profile_photo_url,
+            OwnerUrl: review.author_url,
+            Rating: review.rating,
+            Time: review.relative_time_description
+          }
+        })
+      } else {
+        return []
+      }
+    },
+    rating: function () {
+      if (this.Venue.Place) {
+        return this.Venue.Place.rating
+      }
+      return null
+    }
+  },
+  watch: {
+    '$route.params.Id': function () {
+      this.$store.dispatch('GetVenue', this.$route.params.Id)
+      setTimeout(() => {
+        this.$store.dispatch('GetVenues', {page: 1, limit: 4})
+      }, 1000)
     }
   }
 }

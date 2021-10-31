@@ -1,12 +1,9 @@
 <template>
   <div class="header">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: rgba(0, 0, 0, 0.5) !important; position: absolute; z-index: 999; right:0; left:0">
-      <router-link style="text-decoration: none" :to="{
+      <router-link tag="a"  class="navbar-brand px-4" style="text-decoration: none" :to="{
         name: 'Index'
-      }">
-      <a class="navbar-brand px-4" href="#"
-        ><span style="font-weight:bold; font-size:25px">D</span>akik<span style="font-weight:bold; font-variant:small-caps">a</span>yır</a
-      >
+      }"><span style="font-weight:bold; font-size:25px">D</span>akik<span style="font-weight:bold; font-variant:small-caps">a</span>yır
       </router-link>
       <button
         class="navbar-toggler d-lg-none"
@@ -45,12 +42,12 @@
         </ul>
         <div class="d-flex my-2 my-lg-0 mx-2">
         <search-bar />
-          <button class="btn btn-warning my-2 my-sm-0" type="submit">
+          <router-link tag="button" class="btn btn-warning my-2 my-sm-0" to="/Account/Register">
             Register
-          </button>
-          <button class="btn btn-warning my-2 my-sm-0 mx-2" type="submit">
+          </router-link>
+          <router-link tag="button" class="btn btn-warning my-2 my-sm-0 mx-2" to="/Account/Login">
             Login
-          </button>
+          </router-link>
         </div>
       </div>
     </nav>

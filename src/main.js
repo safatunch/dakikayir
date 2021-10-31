@@ -7,8 +7,8 @@ import { router } from './router/Router'
 import VueResource from 'vue-resource'
 
 Vue.config.productionTip = false
-
 Vue.use(VueResource)
+Vue.http.options.root = 'http://localhost:8081'
 
 /* eslint-disable no-new */
 new Vue({
@@ -17,4 +17,15 @@ new Vue({
   router,
   store,
   template: '<App/>'
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth) {
+    if (store.getters.IsAuthenticated === true) {
+      return next()
+    }
+  } else {
+    return next()
+  }
+  return next('/Account/Login')
 })
