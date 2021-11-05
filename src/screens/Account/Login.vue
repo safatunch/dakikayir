@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                <button type="button" class="btn btn-warning" @click="Login(User)">Giriş Yap</button>
+                <button type="button" class="btn btn-warning" @click="Login">Giriş Yap</button>
                 <button type="button" class="btn btn-danger">Kayıt Ol</button>
                 </div>
             </div>
@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data: function () {
@@ -49,6 +48,14 @@ export default {
       }
     }
   },
-  methods: mapActions(['Login'])
+  methods: {
+    async Login () {
+      this.$store.dispatch('Login', this.User).then(() => {
+        alert('OK')
+      }).catch((er) => {
+        alert(er)
+      })
+    }
+  }
 }
 </script>

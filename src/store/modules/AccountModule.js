@@ -20,18 +20,26 @@ const actions = {
   InitAuth: ({commit}) => {
     const token = localStorage.getItem('token')
     if (token) {
+      Vue.http.headers.common['Authorization'] = 'bearer ' + token
       commit('SetToken', token)
     } else {
       commit('SetToken', '')
     }
   },
   Login: ({commit}, user) => {
-    Vue.http.post('User/Login', user
-    ).then((resp) => {
-      if (resp.status) {
-        localStorage.setItem('token', resp.body)
-        commit('SetToken', resp.body)
-      }
+    return new Promise((resolve, reject) => {
+      Vue.http.post('User/Login', user
+      ).then((resp) => {
+        const response = resp.body
+        if (response.status === true) {
+          Vue.http.headers.common['Authorization'] = 'bearer ' + response.data
+          localStorage.setItem('token', response.data)
+          commit('SetToken', response.data)
+          resolve()
+        } else {
+          reject(response.data)
+        }
+      })
     })
   }
 }

@@ -1,17 +1,12 @@
 import VueRouter from 'vue-router'
 import Vue from 'vue'
+import VenueRoutes from '../screens/Venue/Routes'
 
 Vue.use(VueRouter)
 
 const Index = resolve => {
   require.ensure(['../screens/Home/Index'], () => {
     resolve(require('../screens/Home/Index'))
-  })
-}
-
-const VenueDetail = resolve => {
-  require.ensure(['../screens/Venue/Detail'], () => {
-    resolve(require('../screens/Venue/Detail'))
   })
 }
 
@@ -24,6 +19,17 @@ const Layout = resolve => {
 const EmptyLayout = resolve => {
   require.ensure(['../screens/Shared/EmptyLayout'], () => {
     resolve(require('../screens/Shared/EmptyLayout'))
+  })
+}
+const ErrorLayout = resolve => {
+  require.ensure(['../screens/Shared/ErrorLayout'], () => {
+    resolve(require('../screens/Shared/ErrorLayout'))
+  })
+}
+
+const NotFound = resolve => {
+  require.ensure(['../screens/Error/NotFound'], () => {
+    resolve(require('../screens/Error/NotFound'))
   })
 }
 
@@ -40,28 +46,35 @@ const Register = resolve => {
 }
 
 export const router = new VueRouter({
-  routes: [{
+  routes: [...VenueRoutes, {
     component: Index,
     name: 'Index',
     path: '/',
     meta: { layout: Layout }
   },
   {
-    path: '/Venue/:Id',
-    name: 'VenueDetail',
-    component: VenueDetail,
-    meta: { layout: Layout, requiresAuth: true }
-  },
-  {
     path: '/Account/Register',
     component: Register,
-    meta: { layout: EmptyLayout }
+    meta: { layout: EmptyLayout, disableIfLoggedIn: true }
   },
   {
     path: '/Account/Login',
     component: Login,
-    meta: { layout: EmptyLayout }
+    meta: { layout: EmptyLayout, disableIfLoggedIn: true }
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: NotFound,
+    meta: { layout: ErrorLayout }
   }
   ],
   mode: 'history'
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.disableIfLoggedIn) {
+    return router.push('/')
+  }
+  return next()
 })

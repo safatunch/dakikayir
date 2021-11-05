@@ -42,11 +42,17 @@
         </ul>
         <div class="d-flex my-2 my-lg-0 mx-2">
         <search-bar />
-          <router-link tag="button" class="btn btn-warning my-2 my-sm-0" to="/Account/Register">
-            Register
+          <router-link v-if="!$store.getters.IsAuthenticated" tag="button" class="btn btn-warning my-2 my-sm-0" to="/Account/Register">
+            Kayıt Ol
           </router-link>
-          <router-link tag="button" class="btn btn-warning my-2 my-sm-0 mx-2" to="/Account/Login">
-            Login
+          <router-link v-if="!$store.getters.IsAuthenticated" tag="button" class="btn btn-warning my-2 my-sm-0 mx-2" to="/Account/Login">
+            Giriş Yap
+          </router-link>
+          <router-link v-if="$store.getters.IsAuthenticated" tag="button" class="btn btn-danger my-2 my-sm-0" to="/Account/Logout">
+            <span class="bi bi-box-arrow-in-left"></span>
+          </router-link>
+          <router-link v-if="$store.getters.IsAuthenticated" tag="button" class="btn btn-warning my-2 my-sm-0 mx-2" to="/Account/Profile">
+            Profil
           </router-link>
         </div>
       </div>
@@ -78,6 +84,9 @@
 import SearchBar from '../../components/Shared/Search/SearchBar.vue'
 export default {
   components: { SearchBar },
-  name: 'app-header'
+  name: 'app-header',
+  created () {
+    console.log(this.$store.getters.IsAuthenticated)
+  }
 }
 </script>
